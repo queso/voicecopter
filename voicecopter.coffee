@@ -10,7 +10,6 @@ recordCommand = ->
   exec 'rec test.flac silence -l 1 0.2 1.5% 1 00:01 1.5%', (error, stdout, stderr) ->
     speech file: "test.flac", (err, results) ->
       console.log err if err
-      console.log results
       command = results[0].hypotheses[0].utterance if results[0] and results[0].hypotheses[0]
       processCommand command
 
