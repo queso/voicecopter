@@ -1,3 +1,5 @@
+#killall udhcpd; iwconfig ath0 mode managed essid 'Top Gun Guest WiFi'; ifconfig ath0 10.10.10.203 netmask 255.255.255.0 up;
+
 arDrone = require("ar-drone")
 client = arDrone.createClient({ip: '10.10.10.203'})
 speech = require("google-speech-api")
