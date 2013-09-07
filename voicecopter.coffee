@@ -2,28 +2,51 @@
 #killall udhcpd; iwconfig ath0 mode managed essid 'Top Gun Guest WiFi'; ifconfig ath0 10.10.10.203 netmask 255.255.255.0 up;
 
 arDrone = require("ar-drone")
-client = arDrone.createClient({ip: '10.10.10.203'})
+client = arDrone.createClient()#{ip: '10.10.10.203'})
 speech = require("google-speech-api")
 exec = require('child_process').exec
 
-exec 'rec test.flac silence 1 0.2 1.5% 1 00:01 1.5%', (error, stdout, stderr) ->
-  speech file: "test.flac", (err, results) ->
-    console.log err if err
-    console.log results
-    processCommand results[0].hypotheses[0].utterance
+recordCommand = ->
+  exec 'rec test.flac silence -l 1 0.2 1.5% 1 00:01 1.5%', (error, stdout, stderr) ->
+    speech file: "test.flac", (err, results) ->
+      console.log err if err
+      console.log results
+      command = results[0].hypotheses[0].utterance if results[0].hypotheses[0]
+      processCommand command
 
 processCommand = (text) ->
   console.log "TEXT: #{text}"
   switch text
-    when "launch", "take off"
+    when "launch", "take off", "lunch", "call"
       client.takeoff()
-    when "land"
+    when "land", "lamb", "when", "wind"
       client.land()
-    when "stop"
+    when "stop", "cease", "stuck"
       client.stop()
-    when "move forward"
-      client.front(0.5)
+    when "move forward", "forward", "24", "look forward"
+      client.front(0.2)
+      client.after 1000, ->
+        @stop()
+    when "move back", "back", "backward", "look back", "lupa"
+      client.back(0.2)
+      client.after 1000, ->
+        @stop()
+    when "up", "higher", "rays", "elevate"
+      client.down(0.2)
+      client.after 1000, ->
+        @stop()
+    when "down", "lower"
+      client.down(0.2)
+      client.after 1000, ->
+        @stop()
+    when "flip"
+      client.animate('flipLeft', 1500)
+    when "reset", "Lisa", "reset a"
+      client.disableEmergency()
+    when "shake"
+      client.animate('yawShake', 2000)
+    when "dance"
+      client.animate('yawDance', 2000)
+  recordCommand()
 
-client.after 10000, ->
-  @land()
-
+recordCommand()
